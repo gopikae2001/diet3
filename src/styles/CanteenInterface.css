@@ -1,0 +1,146 @@
+.canteen-container {
+  min-height: 100vh;
+  border-top: 5px solid #0d92ae;
+  background-color: white;
+  padding: 30px;
+  margin: 20px;
+  /* max-width: 1200px; */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* border-radius: 8px; */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+body {
+  background-color: #d9e0e7;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+  background-color: white;
+  color: #038ba4;
+  padding: 15px 20px;
+  font-weight: bold;
+  border-left: 4px solid #038ba4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-size: 1.1rem;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  padding: 20px;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.label {
+  font-weight: bold;
+  color: #038ba4;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 1rem;
+}
+
+.select {
+  width: 220px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.summary-box {
+  background-color: #f9f9f9;
+  padding: 14px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.item-quantity {
+  color: #038ba4;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-top: 6px;
+}
+
+.meal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.meal-table th,
+.meal-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  vertical-align: top;
+  font-size: 0.95rem;
+}
+
+.meal-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+  color: #444;
+}
+
+.badge {
+  display: inline-block;
+  background-color: #eee;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 2px 0;
+  font-size: 0.85em;
+}
+
+.badge.warning {
+  color: #b30000;
+  border: 1px solid pink;
+  background-color: #ffe6e6;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.button-group button {
+  padding: 6px 12px;
+  font-size: 0.85em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn.green {
+  background-color: #e6ffed;
+  color: green;
+}
+
+.btn.green:hover {
+  background-color: #caffd4;
+}
+
+.btn.blue {
+  background-color: #e6f0ff;
+  color: #0055cc;
+}
+
+.btn.blue:hover {
+  background-color: #ccdfff;
+}
