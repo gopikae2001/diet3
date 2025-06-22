@@ -179,8 +179,10 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
       const orderIndex = existingCanteenOrders.findIndex((o: any) => o.id === id);
       
       // Prepare the canteen order data
+      const pkgName = dietPackages.find(p => p.id === approvedOrder.dietPackage)?.name;
       const canteenOrder = {
         ...approvedOrder,
+        dietPackageName: pkgName || 'N/A',
         prepared: false,
         delivered: false,
         mealItems: selectedPackage ? {
