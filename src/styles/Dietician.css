@@ -33,6 +33,7 @@
   font-size: 1.1rem;
 }
 
+
 .section-header {
   background-color: #038ba4;
   color: white;
@@ -91,6 +92,11 @@
   color: #92400e;
 }
 
+.status-badge.paused {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -126,6 +132,11 @@
   background-color: #15803d;
 }
 
+.btn-text.approve:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .btn-text.reject {
   background-color: #dc2626;
   color: white;
@@ -133,6 +144,15 @@
 
 .btn-text.reject:hover {
   background-color: #b91c1c;
+}
+
+.btn-text.pause {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
+.btn-text.pause:hover {
+  background-color: #f59e42;
 }
 
 .btn-text:disabled {

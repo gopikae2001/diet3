@@ -257,6 +257,19 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
     }
   };
 
+  const handlePause = (id: string) => {
+    const updatedOrders = pendingOrders.map(order => {
+      if (order.id === id) {
+        return {
+          ...order,
+          status: 'paused' as const
+        };
+      }
+      return order;
+    });
+    updateOrders(updatedOrders);
+  };
+
   return (
     <>
     <Header sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
@@ -264,12 +277,12 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
       <div className="page-header">
         {/* <h2>Dietician Interface</h2>
         <p>Review and approve diet orders from doctors</p> */}
-        <PageHeader title="Dietician Interface" subtitle="Review and approve diet orders from doctors" />
+        <PageHeader title="Dietician Interface" subtitle="Review and approve diet orders from doctors"/>
       </div>
 
-      <div className="section-header">
+      {/* <div className="section-header">
         {isLoading ? 'LOADING DIET ORDERS...' : `PENDING DIET ORDERS`}
-      </div>
+      </div> */}
 
       <div className="orders-table-wrapper">
         <table className="orders-table">
@@ -309,8 +322,8 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
                 <td>{new Date(order.startDate).toLocaleDateString()}</td>
                 <td>{order.endDate ? new Date(order.endDate).toLocaleDateString() : '-'}</td>
                 <td>
-                  <span className={`status-badge ${order.approvalStatus}`}>
-                    {order.approvalStatus}
+                  <span className={`status-badge ${order.status}`}>
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </span>
                 </td>
                 <td>
@@ -327,6 +340,13 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
                       disabled={order.approvalStatus === 'approved'}
                     >
                       {order.approvalStatus === 'approved' ? 'Approved' : 'Approve'}
+                    </button>
+                    <button 
+                      className="btn-text pause"
+                      onClick={() => handlePause(order.id)}
+                      disabled={order.status === 'paused'}
+                    >
+                      {order.status === 'paused' ? 'Paused' : 'Pause'}
                     </button>
                     <button 
                       className="btn-text reject" 

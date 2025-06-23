@@ -298,7 +298,7 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
         <PageHeader title="Diet Order" subtitle="Meal preparation and delivery management" />
       </div>
       <div className="form-section">
-        <div className="section-header">Diet Order</div>
+        {/* <div className="section-header">Diet Order</div> */}
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">

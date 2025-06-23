@@ -23,6 +23,8 @@ interface MealItems {
   dinner?: MealItemDetail[];
 }
 
+type Status = "pending" | "active" | "paused" | "stopped" | "prepared" | "delivered";
+
 interface MealOrder {
   id: string;
   patientName: string;
@@ -32,7 +34,7 @@ interface MealOrder {
   dietType: string;
   foodItems: FoodItem[];
   specialNotes: string;
-  status: "active" | "paused" | "stopped";
+  status: Status;
   prepared: boolean;
   delivered: boolean;
   dieticianInstructions?: string;
@@ -67,11 +69,21 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
           }
         }
 
+        const status: Status = (['pending', 'active', 'paused', 'stopped', 'prepared', 'delivered'].includes(order.status) ? order.status : 'pending') as Status;
         return {
-          ...order,
+          id: order.id,
+          patientName: order.patientName,
+          bed: order.bed,
+          ward: order.ward,
+          dietPackageName: order.dietPackageName,
           dietType: order.dietPackageName || 'N/A',
           foodItems: foodItems,
           specialNotes: order.dieticianInstructions || '',
+          status,
+          prepared: order.prepared,
+          delivered: order.delivered,
+          dieticianInstructions: order.dieticianInstructions,
+          mealItems: order.mealItems,
         };
       });
 
@@ -96,36 +108,57 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
 
   const updateAndSaveOrders = (updatedOrders: MealOrder[]) => {
     setMealOrders(updatedOrders);
-    // We need to find the original item in local storage to update it,
-    // as the `mealOrders` in state is transformed for display.
     const savedCanteenOrders = localStorage.getItem('canteenOrders');
     if (savedCanteenOrders) {
       const originalOrders: MealOrder[] = JSON.parse(savedCanteenOrders);
       const newOriginalOrders = originalOrders.map(originalOrder => {
         const updatedOrder = updatedOrders.find(uo => uo.id === originalOrder.id);
-        return updatedOrder ? { ...originalOrder, prepared: updatedOrder.prepared, delivered: updatedOrder.delivered } : originalOrder;
+        if (updatedOrder) {
+          const status: Status = (['pending', 'active', 'paused', 'stopped', 'prepared', 'delivered'].includes(updatedOrder.status) ? updatedOrder.status : 'pending') as Status;
+          return {
+            id: originalOrder.id,
+            patientName: originalOrder.patientName,
+            bed: originalOrder.bed,
+            ward: originalOrder.ward,
+            dietPackageName: originalOrder.dietPackageName,
+            dietType: originalOrder.dietType,
+            foodItems: originalOrder.foodItems,
+            specialNotes: originalOrder.specialNotes,
+            status,
+            prepared: updatedOrder.prepared,
+            delivered: updatedOrder.delivered,
+            dieticianInstructions: originalOrder.dieticianInstructions,
+            mealItems: originalOrder.mealItems,
+          };
+        }
+        return originalOrder;
       });
       localStorage.setItem('canteenOrders', JSON.stringify(newOriginalOrders));
     }
   };
 
+  const handleMarkActive = (id: string) => {
+    const updatedOrders = mealOrders.map(order =>
+      order.id === id ? { ...order, status: 'active' as Status, prepared: false, delivered: false } : order
+    );
+    updateAndSaveOrders(updatedOrders);
+  };
+
   const handleMarkPrepared = (id: string) => {
     const updatedOrders = mealOrders.map(order =>
-      order.id === id ? { ...order, prepared: true } : order
+      order.id === id ? { ...order, status: 'prepared' as Status, prepared: true } : order
     );
     updateAndSaveOrders(updatedOrders);
   };
 
   const handleMarkDelivered = (id: string) => {
     const updatedOrders = mealOrders.map(order =>
-      order.id === id ? { ...order, delivered: true } : order
+      order.id === id ? { ...order, status: 'delivered' as Status, delivered: true } : order
     );
     updateAndSaveOrders(updatedOrders);
   };
 
-  const activeOrders = mealOrders.filter(order => order.status === "active");
-
-  const totalQuantities = activeOrders.reduce((acc, order) => {
+  const totalQuantities = mealOrders.reduce((acc, order) => {
     order.foodItems.forEach(item => {
       const quantityMatch = item.quantity.match(/^(\d+)/);
       const quantity = quantityMatch ? parseInt(quantityMatch[1], 10) : 0;
@@ -175,7 +208,7 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
       <div className="card">
         <table className="meal-table">
           <thead>
-            <tr>
+            <tr style={{ backgroundColor: '#038ba4', color: 'white' }}>
               <th>Patient</th>
               <th>Bed/Ward</th>
               <th>Diet Type</th>
@@ -186,7 +219,7 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
             </tr>
           </thead>
           <tbody>
-            {activeOrders.map((order) => (
+            {mealOrders.map((order) => (
               <tr key={order.id}>
                 <td>{order.patientName}</td>
                 <td>{order.bed} / {order.ward}</td>
@@ -204,23 +237,31 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
                   )}
                 </td>
                 <td>
-                  <div>
-                    <span className="badge">{order.prepared ? "Prepared" : "Pending"}</span>
-                    <span className="badge">{order.delivered ? "Delivered" : "Not Delivered"}</span>
-                  </div>
+                  <span className={`badge status-${order.status}`}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
                 </td>
                 <td>
                   <div className="button-group">
-                    {!order.prepared && (
-                      <button className="btn green" onClick={() => handleMarkPrepared(order.id)}>
-                        ✔
-                      </button>
-                    )}
-                    {order.prepared && !order.delivered && (
-                      <button className="btn blue" onClick={() => handleMarkDelivered(order.id)}>
-                        🚚
-                      </button>
-                    )}
+                    <button
+                      className="btn green"
+                      disabled={order.status !== 'pending'}
+                      onClick={() => handleMarkActive(order.id)}
+                    >
+                      Active
+                    </button>
+                    <button
+                      className="btn green"
+                      disabled={order.status !== 'active'}
+                      onClick={() => handleMarkPrepared(order.id)}
+                    >
+                      Prepared
+                    </button>
+                    <button
+                      className="btn blue"
+                      disabled={order.status !== 'prepared'}
+                      onClick={() => handleMarkDelivered(order.id)}
+                    >
+                      Delivered
+                    </button>
                   </div>
                 </td>
               </tr>

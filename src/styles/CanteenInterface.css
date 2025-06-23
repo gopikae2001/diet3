@@ -93,9 +93,13 @@ body {
 }
 
 .meal-table th {
-  background-color: #f2f2f2;
+  background-color: #038ba4;
   text-align: left;
-  color: #444;
+  color: #fff;
+}
+
+.meal-table td {
+  background-color: #fff;
 }
 
 .badge {
@@ -111,6 +115,21 @@ body {
   color: #b30000;
   border: 1px solid pink;
   background-color: #ffe6e6;
+}
+
+.badge.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge.status-prepared {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge.status-delivered {
+  background-color: #e0e7ff;
+  color: #3730a3;
 }
 
 .button-group {
