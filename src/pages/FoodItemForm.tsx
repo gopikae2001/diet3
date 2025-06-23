@@ -8,9 +8,18 @@ import PageHeader from "../components/PageHeader";
 
 // Import the FoodItem type from types file
 import type { FoodItem } from '../types/foodItem';
-// Extend the FoodItem type to include form-specific fields
-interface FoodItemFormData extends Omit<FoodItem, 'id'> {
-  // Add any additional form-specific fields here
+// Define form data type separately to allow quantity as string | number
+interface FoodItemFormData {
+  name: string;
+  foodType: string;
+  category: string;
+  calories: number;
+  protein: number;
+  carbohydrates: number;
+  fat: number;
+  price: number;
+  unit: string;
+  quantity: string | number;
 }
 
 interface FoodItemFormProps {
@@ -50,7 +59,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
     fat: 0,
     price: 0,
     unit: "",
-    quantity: 1,
+    quantity: '',
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
@@ -73,11 +82,14 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    setFormData(prev => ({
-      ...prev,
-      quantity: isNaN(value) ? 1 : Math.max(1, value)
-    }));
+    const value = e.target.value;
+    // Allow empty string for manual entry
+    if (value === '' || /^\d+$/.test(value)) {
+      setFormData(prev => ({
+        ...prev,
+        quantity: value
+      }));
+    }
   };
 
   const handleUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -109,7 +121,13 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    // Validate quantity
+    const quantity = typeof formData.quantity === 'string' ? parseInt(formData.quantity) : formData.quantity;
+    if (isNaN(quantity) || quantity < 1) {
+      setNotification({ message: 'Please enter a valid quantity (1 or more).', show: true });
+      setTimeout(() => setNotification({ message: '', show: false }), 3000);
+      return;
+    }
     const newItem: FoodItem = {
       id: editingId || Date.now().toString(),
       name: formData.name,
@@ -121,7 +139,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
       fat: formData.fat,
       price: formData.price,
       unit: formData.unit,
-      quantity: formData.quantity,
+      quantity: quantity,
     };
 
     try {
@@ -135,7 +153,6 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
         setFoodItems(items => [...items, createdItem]);
         setNotification({ message: 'Item added successfully!', show: true });
       }
-      
       // Hide notification after 3 seconds
       setTimeout(() => setNotification({ message: '', show: false }), 3000);
     } catch (error) {
@@ -143,15 +160,16 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
       setNotification({ message: 'Failed to save item. Please try again.', show: true });
       setTimeout(() => setNotification({ message: '', show: false }), 3000);
     }
-
     resetForm();
   };
 
   const handleEdit = (item: FoodItem) => {
     const { id, ...itemData } = item;
-    setFormData(itemData);
+    setFormData({
+      ...itemData,
+      quantity: String(itemData.quantity)
+    });
     setEditingId(id);
-    
     // Handle custom unit display
     if (!['g', 'ml', 'cup', 'tbsp', 'tsp', 'piece'].includes(item.unit)) {
       setShowCustomUnit(true);
@@ -173,7 +191,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
       fat: 0,
       price: 0,
       unit: "",
-      quantity: 1,
+      quantity: '',
     });
     setEditingId(null);
     setShowCustomUnit(false);
@@ -317,11 +335,13 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
           <div className="form-group">
               <label>Quantity</label>
               <input
-                type="number"
+                type="text"
                 name="quantity"
-                min="1"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={formData.quantity}
                 onChange={handleQuantityChange}
+                placeholder="Enter quantity"
                 required
               />
             </div>
@@ -432,8 +452,39 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
                     <td>{item.unit}</td>
                     <td>{item.quantity}</td>
                     <td>
-                      <button onClick={() => handleEdit(item)}>Edit</button>
-                      <button onClick={() => handleDelete(item.id)}>Delete</button>
+                      <button 
+                        onClick={() => handleEdit(item)}
+                        style={{
+                          padding: '4px 12px',
+                          marginRight: '8px',
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4CAF50'}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(item.id)}
+                        style={{
+                          padding: '4px 12px',
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#d32f2f'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f44336'}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -61,6 +61,16 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
   const [selectedPackage, setSelectedPackage] = useState<DietPackage | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPackageId, setEditingPackageId] = useState<string>("");
+  const [showCustomDietForm, setShowCustomDietForm] = useState(false);
+  const [customDietForm, setCustomDietForm] = useState({
+    patientName: '',
+    dietPackage: '',
+    rate: '',
+    startDate: '',
+    endDate: '',
+    status: 'active',
+    approvalStatus: 'pending',
+  });
 
   // Load orders and packages from localStorage on component mount
   useEffect(() => {
@@ -94,8 +104,6 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
       setInstructions(selectedOrder.dieticianInstructions || '');
     }
   }, [selectedOrder, dietPackages]);
-
-
 
   const updateOrders = (updatedOrders: DietOrder[]) => {
     setPendingOrders(updatedOrders);
@@ -270,19 +278,185 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
     updateOrders(updatedOrders);
   };
 
+  const handleRestart = (id: string) => {
+    const updatedOrders = pendingOrders.map(order => {
+      if (order.id === id) {
+        return {
+          ...order,
+          status: 'active' as const
+        };
+      }
+      return order;
+    });
+    updateOrders(updatedOrders);
+    showNotification('Diet order restarted!', 'success');
+  };
+
+  // Autofill rate when package changes
+  const handleCustomDietPackageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const pkgId = e.target.value;
+    const pkg = dietPackages.find(p => p.id === pkgId);
+    setCustomDietForm(prev => ({
+      ...prev,
+      dietPackage: pkgId,
+      rate: pkg ? pkg.totalRate.toString() : ''
+    }));
+  };
+  const handleCustomDietInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setCustomDietForm(prev => ({ ...prev, [name]: value }));
+  };
+  const handleCustomDietSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customDietForm.patientName || !customDietForm.dietPackage || !customDietForm.startDate) {
+      showNotification('Please fill all required fields', 'error');
+      return;
+    }
+    const pkg = dietPackages.find(p => p.id === customDietForm.dietPackage);
+    const newOrder = {
+      id: Date.now().toString(),
+      patientName: customDietForm.patientName,
+      patientId: '',
+      bed: '',
+      ward: '',
+      dietPackage: customDietForm.dietPackage,
+      packageName: pkg ? pkg.name : '',
+      startDate: customDietForm.startDate,
+      endDate: customDietForm.endDate,
+      doctorNotes: '',
+      status: customDietForm.status as Status,
+      approvalStatus: customDietForm.approvalStatus as ApprovalStatus,
+      dieticianInstructions: '',
+    };
+    const updatedOrders = [...pendingOrders, newOrder];
+    updateOrders(updatedOrders);
+    setShowCustomDietForm(false);
+    setCustomDietForm({
+      patientName: '',
+      dietPackage: '',
+      rate: '',
+      startDate: '',
+      endDate: '',
+      status: 'active',
+      approvalStatus: 'pending',
+    });
+    showNotification('Custom diet order added!', 'success');
+  };
+
   return (
     <>
     <Header sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
     <div className="dietician-container">
-      <div className="page-header">
-        {/* <h2>Dietician Interface</h2>
-        <p>Review and approve diet orders from doctors</p> */}
+      <div className="header" style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <PageHeader title="Dietician Interface" subtitle="Review and approve diet orders from doctors"/>
+        <button
+          className="add-custom-diet-btn"
+          onClick={() => setShowCustomDietForm(f => !f)}
+        >
+          + Add Custom Diet
+        </button>
       </div>
 
-      {/* <div className="section-header">
-        {isLoading ? 'LOADING DIET ORDERS...' : `PENDING DIET ORDERS`}
-      </div> */}
+      {showCustomDietForm && (
+        <div className="form-section" style={{marginBottom:'2rem'}}>
+          <div className="section-header">Add Custom Diet Order</div>
+          <form className="form" onSubmit={handleCustomDietSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Patient Name</label>
+                <input
+                  type="text"
+                  name="patientName"
+                  className="form-control"
+                  value={customDietForm.patientName}
+                  onChange={handleCustomDietInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Diet Package</label>
+                <select
+                  name="dietPackage"
+                  className="form-control"
+                  value={customDietForm.dietPackage}
+                  onChange={handleCustomDietPackageChange}
+                  required
+                >
+                  <option value="">Select a package</option>
+                  {dietPackages.map(pkg => (
+                    <option key={pkg.id} value={pkg.id}>{pkg.name} ({pkg.type})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Rate</label>
+                <input
+                  type="text"
+                  name="rate"
+                  className="form-control"
+                  value={customDietForm.rate}
+                  readOnly
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Start Date</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  className="form-control"
+                  value={customDietForm.startDate}
+                  onChange={handleCustomDietInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>End Date</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  className="form-control"
+                  value={customDietForm.endDate}
+                  onChange={handleCustomDietInputChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  name="status"
+                  className="form-control"
+                  value={customDietForm.status}
+                  onChange={handleCustomDietInputChange}
+                  required
+                >
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="stopped">Stopped</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Approval</label>
+                <select
+                  name="approvalStatus"
+                  className="form-control"
+                  value={customDietForm.approvalStatus}
+                  onChange={handleCustomDietInputChange}
+                  required
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-actions">
+              <button className="btn-text approve" type="submit">Add Order</button>
+              <button className="btn-text" type="button" onClick={() => setShowCustomDietForm(false)}>Cancel</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="orders-table-wrapper">
         <table className="orders-table">
@@ -342,11 +516,10 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
                       {order.approvalStatus === 'approved' ? 'Approved' : 'Approve'}
                     </button>
                     <button 
-                      className="btn-text pause"
-                      onClick={() => handlePause(order.id)}
-                      disabled={order.status === 'paused'}
+                      className={`btn-text ${order.status === 'paused' ? 'restart' : 'pause'}`}
+                      onClick={() => order.status === 'paused' ? handleRestart(order.id) : handlePause(order.id)}
                     >
-                      {order.status === 'paused' ? 'Paused' : 'Pause'}
+                      {order.status === 'paused' ? 'Restart' : 'Pause'}
                     </button>
                     <button 
                       className="btn-text reject" 

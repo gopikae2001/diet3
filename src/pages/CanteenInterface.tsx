@@ -15,12 +15,17 @@ interface MealItemDetail {
   unit: string;
 }
 
+interface MealWithStatus {
+  items: MealItemDetail[];
+  status: Status;
+}
+
 interface MealItems {
-  breakfast?: MealItemDetail[];
-  brunch?: MealItemDetail[];
-  lunch?: MealItemDetail[];
-  evening?: MealItemDetail[];
-  dinner?: MealItemDetail[];
+  breakfast?: MealWithStatus;
+  brunch?: MealWithStatus;
+  lunch?: MealWithStatus;
+  evening?: MealWithStatus;
+  dinner?: MealWithStatus;
 }
 
 type Status = "pending" | "active" | "paused" | "stopped" | "prepared" | "delivered";
@@ -58,18 +63,29 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
       const transformedOrders = parsedOrders.map(order => {
         const mealKey = selectedMeal as keyof MealItems;
         let foodItems: FoodItem[] = [];
-
+        let mealStatus: Status = 'pending';
+        let mealItems: MealItems = {};
         if (order.mealItems && order.mealItems[mealKey]) {
-          const mealItemsList = order.mealItems[mealKey];
-          if (Array.isArray(mealItemsList)) {
-            foodItems = mealItemsList.map(item => ({
+          if ('items' in order.mealItems[mealKey]) {
+            foodItems = (order.mealItems[mealKey] as MealWithStatus).items.map(item => ({
               name: item.foodItemName,
               quantity: `${item.quantity} ${item.unit}`
             }));
+            mealStatus = (order.mealItems[mealKey] as MealWithStatus).status;
+            mealItems = order.mealItems as MealItems;
+          } else {
+            const items = (order.mealItems[mealKey] as MealItemDetail[]);
+            foodItems = items.map(item => ({
+              name: item.foodItemName,
+              quantity: `${item.quantity} ${item.unit}`
+            }));
+            mealStatus = 'pending';
+            mealItems = {
+              ...order.mealItems,
+              [mealKey]: { items, status: 'pending' as Status }
+            };
           }
         }
-
-        const status: Status = (['pending', 'active', 'paused', 'stopped', 'prepared', 'delivered'].includes(order.status) ? order.status : 'pending') as Status;
         return {
           id: order.id,
           patientName: order.patientName,
@@ -79,11 +95,11 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
           dietType: order.dietPackageName || 'N/A',
           foodItems: foodItems,
           specialNotes: order.dieticianInstructions || '',
-          status,
-          prepared: order.prepared,
-          delivered: order.delivered,
+          status: mealStatus,
+          prepared: mealStatus === 'prepared',
+          delivered: mealStatus === 'delivered',
           dieticianInstructions: order.dieticianInstructions,
-          mealItems: order.mealItems,
+          mealItems: mealItems,
         };
       });
 
@@ -138,23 +154,59 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
   };
 
   const handleMarkActive = (id: string) => {
-    const updatedOrders = mealOrders.map(order =>
-      order.id === id ? { ...order, status: 'active' as Status, prepared: false, delivered: false } : order
-    );
+    const updatedOrders = mealOrders.map(order => {
+      if (order.id === id && order.mealItems && order.mealItems[selectedMeal as keyof MealItems]) {
+        return {
+          ...order,
+          mealItems: {
+            ...order.mealItems,
+            [selectedMeal]: {
+              ...order.mealItems[selectedMeal as keyof MealItems],
+              status: 'active' as Status
+            }
+          }
+        };
+      }
+      return order;
+    });
     updateAndSaveOrders(updatedOrders);
   };
 
   const handleMarkPrepared = (id: string) => {
-    const updatedOrders = mealOrders.map(order =>
-      order.id === id ? { ...order, status: 'prepared' as Status, prepared: true } : order
-    );
+    const updatedOrders = mealOrders.map(order => {
+      if (order.id === id && order.mealItems && order.mealItems[selectedMeal as keyof MealItems]) {
+        return {
+          ...order,
+          mealItems: {
+            ...order.mealItems,
+            [selectedMeal]: {
+              ...order.mealItems[selectedMeal as keyof MealItems],
+              status: 'prepared' as Status
+            }
+          }
+        };
+      }
+      return order;
+    });
     updateAndSaveOrders(updatedOrders);
   };
 
   const handleMarkDelivered = (id: string) => {
-    const updatedOrders = mealOrders.map(order =>
-      order.id === id ? { ...order, status: 'delivered' as Status, delivered: true } : order
-    );
+    const updatedOrders = mealOrders.map(order => {
+      if (order.id === id && order.mealItems && order.mealItems[selectedMeal as keyof MealItems]) {
+        return {
+          ...order,
+          mealItems: {
+            ...order.mealItems,
+            [selectedMeal]: {
+              ...order.mealItems[selectedMeal as keyof MealItems],
+              status: 'delivered' as Status
+            }
+          }
+        };
+      }
+      return order;
+    });
     updateAndSaveOrders(updatedOrders);
   };
 
@@ -219,53 +271,56 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
             </tr>
           </thead>
           <tbody>
-            {mealOrders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.patientName}</td>
-                <td>{order.bed} / {order.ward}</td>
-                <td>{order.dietType}</td>
-                <td>
-                  <ul>
-                    {order.foodItems.map((item, index) => (
-                      <li key={index}>{item.name} - {item.quantity}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>
-                  {order.specialNotes && (
-                    <span className="badge warning">{order.specialNotes}</span>
-                  )}
-                </td>
-                <td>
-                  <span className={`badge status-${order.status}`}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
-                </td>
-                <td>
-                  <div className="button-group">
-                    <button
-                      className="btn green"
-                      disabled={order.status !== 'pending'}
-                      onClick={() => handleMarkActive(order.id)}
-                    >
-                      Active
-                    </button>
-                    <button
-                      className="btn green"
-                      disabled={order.status !== 'active'}
-                      onClick={() => handleMarkPrepared(order.id)}
-                    >
-                      Prepared
-                    </button>
-                    <button
-                      className="btn blue"
-                      disabled={order.status !== 'prepared'}
-                      onClick={() => handleMarkDelivered(order.id)}
-                    >
-                      Delivered
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {mealOrders.map((order) => {
+              const mealStatus = order.mealItems && order.mealItems[selectedMeal as keyof MealItems]?.status || 'pending';
+              return (
+                <tr key={order.id}>
+                  <td>{order.patientName}</td>
+                  <td>{order.bed} / {order.ward}</td>
+                  <td>{order.dietType}</td>
+                  <td>
+                    <ul>
+                      {order.foodItems.map((item, index) => (
+                        <li key={index}>{item.name} - {item.quantity}</li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td>
+                    {order.specialNotes && (
+                      <span className="badge warning">{order.specialNotes}</span>
+                    )}
+                  </td>
+                  <td>
+                    <span className={`badge status-${mealStatus}`}>{mealStatus.charAt(0).toUpperCase() + mealStatus.slice(1)}</span>
+                  </td>
+                  <td>
+                    <div className="button-group">
+                      <button
+                        className="btn green"
+                        disabled={mealStatus !== 'pending'}
+                        onClick={() => handleMarkActive(order.id)}
+                      >
+                        Active
+                      </button>
+                      <button
+                        className="btn green"
+                        disabled={mealStatus !== 'active'}
+                        onClick={() => handleMarkPrepared(order.id)}
+                      >
+                        Prepared
+                      </button>
+                      <button
+                        className="btn blue"
+                        disabled={mealStatus !== 'prepared'}
+                        onClick={() => handleMarkDelivered(order.id)}
+                      >
+                        Delivered
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
