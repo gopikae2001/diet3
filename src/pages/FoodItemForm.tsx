@@ -347,7 +347,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
             </div>
 
 
-          <div className="sub-header">Nutritional Information (per 100g/ml)</div>
+          <div className="sub-header">Nutritional Information</div>
           <div className="nutritional-section">
             <div className="form-row">
               <div className="form-group">

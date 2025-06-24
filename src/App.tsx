@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // import { ToastContainer } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import SideBar from './components/SideBar';
@@ -44,7 +44,8 @@ const App: React.FC = () => {
           <SideBar collapsed={sidebarCollapsed} />
           <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
             <Routes>
-              <Route path="/dashboard" element={<Dashboard  sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/fooditem" element={<FoodItemForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietpackage" element={<DietPackageForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietorder" element={<DietOrderForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />

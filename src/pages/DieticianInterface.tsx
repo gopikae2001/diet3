@@ -186,19 +186,20 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
       // Check if order already exists in canteen orders
       const orderIndex = existingCanteenOrders.findIndex((o: any) => o.id === id);
       
-      // Prepare the canteen order data
-      const pkgName = dietPackages.find(p => p.id === approvedOrder.dietPackage)?.name;
+      // Always fetch the correct package for this order
+      const pkg = dietPackages.find(p => p.id === approvedOrder.dietPackage);
+      const pkgName = pkg?.name;
       const canteenOrder = {
         ...approvedOrder,
         dietPackageName: pkgName || 'N/A',
         prepared: false,
         delivered: false,
-        mealItems: selectedPackage ? {
-          breakfast: selectedPackage.breakfast || [],
-          brunch: selectedPackage.brunch || [],
-          lunch: selectedPackage.lunch || [],
-          evening: selectedPackage.evening || [],
-          dinner: selectedPackage.dinner || []
+        mealItems: pkg ? {
+          breakfast: pkg.breakfast || [],
+          brunch: pkg.brunch || [],
+          lunch: pkg.lunch || [],
+          evening: pkg.evening || [],
+          dinner: pkg.dinner || []
         } : {}
       };
 
