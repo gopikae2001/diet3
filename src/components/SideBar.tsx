@@ -63,7 +63,22 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
             </NavLink>
           </li>
           <ul className="sidebar-sublist">
-          <li>
+            <li>
+              <NavLink
+                to="/dashboard"
+                style={{fontWeight:400,color:"#cccccc"}}
+                className={({ isActive }) =>
+                  isActive ? "nav-item active" : "nav-item"
+                }
+                title={collapsed ? "Dashboard" : ""}
+              >
+                <span>
+                  <FontAwesomeIcon icon={faCaretRight} />
+                </span>
+                {!collapsed && "Dashboard"}
+              </NavLink>
+            </li>
+            <li>
               <NavLink
                 to="/fooditem" style={{fontWeight:400,color:"#cccccc"}}
                 className={({ isActive }) =>

@@ -454,34 +454,13 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
                     <td>
                       <button 
                         onClick={() => handleEdit(item)}
-                        style={{
-                          padding: '4px 12px',
-                          marginRight: '8px',
-                          backgroundColor: '#4CAF50',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.2s'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4CAF50'}
+                        className="btn-edit"
                       >
                         Edit
                       </button>
                       <button 
                         onClick={() => handleDelete(item.id)}
-                        style={{
-                          padding: '4px 12px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.2s'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#d32f2f'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f44336'}
+                        className="btn-delete"
                       >
                         Delete
                       </button>
@@ -497,4 +476,5 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
     </>
   );
 }
+
 export default FoodItemForm;

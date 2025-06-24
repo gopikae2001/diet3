@@ -10,7 +10,7 @@ import DieticianInterface from './pages/DieticianInterface';
 import DietOrderForm from './pages/DietOrderForm';
 import DietPackageForm from './pages/DietPackageForm';
 import FoodItemForm from './pages/FoodItemForm';
-// import Dashboard from './pages/Dashboard.tsx';
+import Dashboard from './pages/Dashboard';
 // import VehicleRegistration from './pages/VehicleRegistration.tsx';
 // import VehicleList from './pages/VehicleList.tsx';
 // import InsuranceManagement from './pages/InsuranceManagement.tsx';
@@ -44,6 +44,7 @@ const App: React.FC = () => {
           <SideBar collapsed={sidebarCollapsed} />
           <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
             <Routes>
+              <Route path="/dashboard" element={<Dashboard  sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/fooditem" element={<FoodItemForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietpackage" element={<DietPackageForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietorder" element={<DietOrderForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
