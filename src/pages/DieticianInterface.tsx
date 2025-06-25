@@ -463,6 +463,7 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
         <table className="orders-table">
           <thead>
             <tr>
+              <th>S.No.</th>
               <th>Patient</th>
               <th>Bed/Ward</th>
               <th>Diet Package</th>
@@ -486,8 +487,9 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
                 </td>
               </tr>
             ) : (
-              pendingOrders.map(order => (
+              pendingOrders.map((order, index) => (
               <tr key={order.id}>
+                <td>{index + 1}</td>
                 <td>
                   <div className="patient-name">{order.patientName}</div>
                   <div className="patient-id">ID: {order.patientId}</div>

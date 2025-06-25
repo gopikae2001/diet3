@@ -35,7 +35,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 30px;
-  margin: 20px 0;
+  /* margin: 0px 0; */
   width: 100%;
 }
 
@@ -84,6 +84,18 @@
   width: 100%;
   overflow: hidden;
 }
+.meal-items-section {
+  width: 100%;
+  margin-top: 20px;
+}
+.meal-items-section .meal-type {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.meal-items-table {
+  width: 100%;
+}
+
 
 .meal-row select,
 .meal-row input {

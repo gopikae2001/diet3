@@ -105,7 +105,7 @@ body {
 .badge {
   display: inline-block;
   background-color: #eee;
-  padding: 4px 8px;
+  padding: 10px 10px;
   border-radius: 4px;
   margin: 2px 0;
   font-size: 0.85em;
@@ -152,7 +152,7 @@ body {
 }
 
 .btn.green:hover {
-  background-color: #caffd4;
+  background-color: #19742a;
 }
 
 .btn.blue {
@@ -161,5 +161,6 @@ body {
 }
 
 .btn.blue:hover {
-  background-color: #ccdfff;
+  background-color: #527dc7;
+  color: white;
 }

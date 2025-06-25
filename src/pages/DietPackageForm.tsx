@@ -394,6 +394,7 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
           <table>
             <thead>
               <tr>
+                <th>S.No.</th>
                 <th>Package Name</th>
                 <th>Diet Type</th>
                 <th>Total Rate</th>
@@ -402,8 +403,9 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
               </tr>
             </thead>
             <tbody>
-              {dietPackages.map((pkg) => (
+              {dietPackages.map((pkg, index) => (
                 <tr key={pkg.id}>
+                  <td>{index + 1}</td>
                   <td>{pkg.name}</td>
                   <td>{pkg.type}</td>
                   <td>₹{pkg.totalRate.toFixed(2)}</td>

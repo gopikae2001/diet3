@@ -261,6 +261,7 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
         <table className="meal-table">
           <thead>
             <tr style={{ backgroundColor: '#038ba4', color: 'white' }}>
+              <th>S.No</th>
               <th>Patient</th>
               <th>Bed/Ward</th>
               <th>Diet Type</th>
@@ -271,10 +272,11 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
             </tr>
           </thead>
           <tbody>
-            {mealOrders.map((order) => {
+            {mealOrders.map((order, index) => {
               const mealStatus = order.mealItems && order.mealItems[selectedMeal as keyof MealItems]?.status || 'pending';
               return (
                 <tr key={order.id}>
+                  <td>{index + 1}</td>
                   <td>{order.patientName}</td>
                   <td>{order.bed} / {order.ward}</td>
                   <td>{order.dietType}</td>

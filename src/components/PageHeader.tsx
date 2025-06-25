@@ -11,7 +11,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, icon }) => {
     <div className="page-header">
       {icon && <span className="page-header-icon">{icon}</span>}
       <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
-      <p className="subtitle" text-gray-700>{subtitle}</p>
+      <p className="subtitle text-gray-700">{subtitle}</p>
     </div>
   );
 };

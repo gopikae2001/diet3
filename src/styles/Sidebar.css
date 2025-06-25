@@ -25,6 +25,19 @@
   /* color: black !important; */
   padding: 8px 15px;
 }
+.sidebar input:focus{
+  box-shadow: 0px 0px 2px 2px rgba(54,162,235,0.6);
+}
+
+.sidebar input::placeholder{
+  color:white;
+}
+
+.sidebar .searchbar{
+  border-color: #0d92ae;
+  margin-bottom: 0.2rem; 
+  margin-top: 0.1rem;
+}
 
 .sidebar-heading2{
   background-color: #80def7;
@@ -194,7 +207,7 @@ span {
   max-width: 95%; /* or set a fixed width */
   background-color: black;
   border-radius: 4px;
-  box-shadow: rgba(0, 0, 0, 0.075) 0px 1px 1px 0px inset;
+  box-shadow: rgba(72, 214, 250, 0.075) 0px 1px 1px 0px inset;
   outline: none;
 }
 .searchbar input{

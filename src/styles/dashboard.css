@@ -31,9 +31,10 @@
 }
 
 .subtitle {
-  margin-top: 0.25rem;
+  margin-top: 0.8rem;
   color: #555;
   font-size: 1rem;
+  font-weight: 400;
 }
 
 .dashboard-summary-cards {
@@ -58,11 +59,11 @@
 }
 .summary-card:hover {
   transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 8px 24px rgba(54,162,235,0.18);
+  box-shadow: 0 8px 24px rgba(0, 8, 14, 0.18);
 }
 .summary-title {
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: bold;
   margin-bottom: 0.5rem;
   opacity: 0.9;
 }

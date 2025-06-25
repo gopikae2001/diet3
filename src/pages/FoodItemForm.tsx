@@ -425,6 +425,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
             <table>
               <thead>
                 <tr>
+                  <th>S.No.</th>
                   <th>Name</th>
                   <th>Food Type</th>
                   <th>Category</th>
@@ -439,8 +440,9 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
                 </tr>
               </thead>
               <tbody>
-                {foodItems.map((item) => (
+                {foodItems.map((item, index) => (
                   <tr key={item.id}>
+                    <td>{index + 1}</td>
                     <td>{item.name}</td>
                     <td>{item.foodType}</td>
                     <td>{item.category}</td>

@@ -499,6 +499,7 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
           <table>
             <thead>
               <tr>
+                <th>S.No</th>
                 <th>Patient</th>
                 <th>Bed/Ward</th>
                 <th>Package</th>
@@ -511,8 +512,9 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
               </tr>
             </thead>
             <tbody>
-              {orders.map((o) => (
+              {orders.map((o, index) => (
                 <tr key={o.id}>
+                  <td>{index + 1}</td>
                   <td>{o.patientName}</td>
                   <td>{o.bed} / {o.ward}</td>
                   <td>{o.packageName || dietPackages.find(p => p.id === o.dietPackage)?.name || "Unknown"}</td>
