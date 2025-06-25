@@ -92,6 +92,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
                 {!collapsed && "Food Item"}
               </NavLink>
             </li>
+           
             <li>
               <NavLink
                 to="/dietpackage" style={{fontWeight:400,color:"#cccccc"}}
@@ -108,6 +109,34 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
             </li>
             <li>
               <NavLink
+                to="/dietrequest" style={{fontWeight:400,color:"#cccccc"}}
+                className={({ isActive }) =>
+                  isActive ? "nav-item active" : "nav-item"
+                }
+                title={collapsed ? "Diet Request" : ""}
+              >
+                <span>
+                  <FontAwesomeIcon icon={faCaretRight} />
+                </span>
+                {!collapsed && "Diet Request"}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dietrequestapproval" style={{fontWeight:400,color:"#cccccc"}}
+                className={({ isActive }) =>
+                  isActive ? "nav-item active" : "nav-item"
+                }
+                title={collapsed ? "Diet Request Approval" : ""}
+              >
+                <span>
+                  <FontAwesomeIcon icon={faCaretRight} />
+                </span>
+                {!collapsed && "Diet Request Approval"}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
                 to="/dietorder" style={{fontWeight:400,color:"#cccccc"}}
                 className={({ isActive }) =>
                   isActive ? "nav-item active" : "nav-item"
@@ -120,6 +149,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
                 {!collapsed && "Diet Order"}
               </NavLink>
             </li>
+           
            
             <li>
               <NavLink

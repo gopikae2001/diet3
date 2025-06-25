@@ -60,7 +60,10 @@ const loadDietPackages = (): DietPackage[] => {
   }
 };
 
+import { useLocation } from 'react-router-dom';
+
 const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleSidebar }) => {
+  const location = useLocation();
   // Load saved orders and diet packages from localStorage on initial render
   const [dietPackages, setDietPackages] = useState<DietPackage[]>(() => loadDietPackages());
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -106,6 +109,7 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
     patientId: string;
     bed: string;
     ward: string;
+    floor?: string;
     dietPackage: string;
     packageRate: string;
     startDate: string;
@@ -115,18 +119,23 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
     approvalStatus: "pending" | "approved" | "rejected";
   }
 
-  const [form, setForm] = useState<FormState>({
-    patientName: "",
-    patientId: "",
-    bed: "",
-    ward: "",
-    dietPackage: "",
-    packageRate: "",
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: "",
-    doctorNotes: "",
-    status: "active",
-    approvalStatus: "pending"
+  // Initialize form with default values or values from location state
+  const [form, setForm] = useState<FormState>(() => {
+    const state = location.state || {};
+    return {
+      patientName: state.patientName || "",
+      patientId: state.patientId || "",
+      bed: state.bed || "",
+      ward: state.ward || "",
+      floor: state.floor || "",
+      dietPackage: "",
+      packageRate: "",
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: "",
+      doctorNotes: state.doctorNotes || "",
+      status: "active",
+      approvalStatus: "pending"
+    };
   });
   
   const [selectedPackageDetails, setSelectedPackageDetails] = useState<DietPackage | null>(null);

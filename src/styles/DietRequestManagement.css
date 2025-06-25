@@ -1,0 +1,134 @@
+.dietrequest-container {
+  min-height: 100vh;
+  border-top: 5px solid #0d92ae;
+  background-color: white;
+  padding: 30px;
+  margin: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dietrequest-container .header {
+  background-color: white;
+  color: #0d92ae;
+  padding: 15px 20px;
+  font-weight: bold;
+  border-left: 4px solid #0d92ae;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-size: 1.1rem;
+}
+
+.dietrequest-table-container {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.dietrequest-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.dietrequest-table th,
+.dietrequest-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  vertical-align: top;
+  font-size: 12px;
+}
+
+.dietrequest-table th {
+  background-color: #0d92ae;
+  text-align: left;
+  color: #fff;
+}
+
+.dietrequest-table td {
+  background-color: #fff;
+  border-bottom: none;
+}
+
+/* .dietrequest-table tr:last-child td {
+  border-bottom: 1px solid #ddd;
+} */
+
+
+.form-group{
+  min-width: 300px;
+}
+
+.btn-text{
+  padding: 8px 12px;
+  font-size: 0.85em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.badge {
+  display: inline-block;
+  background-color: #eee;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 2px 0;
+  font-size: 0.85em;
+}
+
+.badge.status-pending {
+  background-color: #ffe082;
+  color: #a67c00;
+}
+.badge.status-dietorderplaced {
+  background-color: #b2f2bb;
+  color: #087f23;
+}
+.badge.status-rejected {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+.btn {
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin: 1px;
+  line-height: 1.2;
+}
+
+.btn.green {
+  background-color: #0d92ae;
+  color: white;
+}
+.btn.green:hover {
+  background-color: #087f96;
+}
+
+.btn.blue {
+  background-color: #1976d2;
+  color: white;
+}
+.btn.blue:hover {
+  background-color: #125ea2;
+}
+
+@media (max-width: 800px) {
+  .dietrequest-container {
+    padding: 10px;
+    margin: 5px;
+  }
+  .dietrequest-table th, .dietrequest-table td {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+} 

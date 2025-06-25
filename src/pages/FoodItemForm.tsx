@@ -402,7 +402,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
           </div>
 
           <div className="form-group">
-            <label>Price per Unit</label>
+            <label>Price</label>
             <input 
               type="number"
               name="price"

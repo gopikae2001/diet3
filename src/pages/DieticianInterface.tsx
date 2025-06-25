@@ -5,6 +5,9 @@ import '../styles/Notification.css';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHeader from "../components/PageHeader";
+import { foodItemApi } from "../api/foodItemApi";
+import type { FoodItem } from "../types/foodItem";
+
 type Status = "active" | "paused" | "stopped";
 type ApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -48,10 +51,20 @@ interface DietOrder {
   approvalStatus: ApprovalStatus;
   dieticianInstructions?: string;
 }
+
 interface DieticianInterface {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
 }
+
+type MealType = 'breakfast' | 'brunch' | 'lunch' | 'evening' | 'dinner';
+interface CustomPlanMealItem {
+  foodItemId: string;
+  foodItemName: string;
+  quantity: number;
+  unit: string;
+}
+
 const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, toggleSidebar }) => {
   const [pendingOrders, setPendingOrders] = useState<DietOrder[]>([]);
   const [dietPackages, setDietPackages] = useState<DietPackage[]>([]);
@@ -71,6 +84,26 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
     status: 'active',
     approvalStatus: 'pending',
   });
+  const [showCustomPlanForm, setShowCustomPlanForm] = useState(false);
+  const [customPlanForm, setCustomPlanForm] = useState({
+    name: '',
+    patientId: '',
+    age: '',
+    startDate: '',
+    endDate: '',
+    packageName: '',
+    status: 'active',
+    approvalStatus: 'pending',
+  });
+  const [customPlanMeals, setCustomPlanMeals] = useState<Record<MealType, CustomPlanMealItem[]>>({
+    breakfast: [],
+    brunch: [],
+    lunch: [],
+    evening: [],
+    dinner: [],
+  });
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [customPlanAmount, setCustomPlanAmount] = useState(0);
 
   // Load orders and packages from localStorage on component mount
   useEffect(() => {
@@ -104,6 +137,22 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
       setInstructions(selectedOrder.dieticianInstructions || '');
     }
   }, [selectedOrder, dietPackages]);
+
+  useEffect(() => {
+    foodItemApi.getAll().then(setFoodItems);
+  }, []);
+
+  useEffect(() => {
+    // Calculate total amount
+    let total = 0;
+    Object.values(customPlanMeals).forEach(mealArr => {
+      mealArr.forEach((item: any) => {
+        const food = foodItems.find(f => f.id === item.foodItemId);
+        if (food) total += food.price * (item.quantity || 1);
+      });
+    });
+    setCustomPlanAmount(total);
+  }, [customPlanMeals, foodItems]);
 
   const updateOrders = (updatedOrders: DietOrder[]) => {
     setPendingOrders(updatedOrders);
@@ -344,23 +393,91 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
     showNotification('Custom diet order added!', 'success');
   };
 
+  const addCustomPlanMealItem = (mealType: MealType) => {
+    setCustomPlanMeals(prev => ({
+      ...prev,
+      [mealType]: [...prev[mealType], { foodItemId: '', foodItemName: '', quantity: 1, unit: '' }],
+    }));
+  };
+  const updateCustomPlanMealItem = (mealType: MealType, idx: number, field: string, value: any) => {
+    setCustomPlanMeals(prev => {
+      const arr = [...prev[mealType]];
+      arr[idx] = { ...arr[idx], [field]: value };
+      if (field === 'foodItemId') {
+        const food = foodItems.find(f => f.id === value);
+        if (food) {
+          arr[idx].foodItemName = food.name;
+          arr[idx].unit = food.unit;
+        }
+      }
+      return { ...prev, [mealType]: arr };
+    });
+  };
+  const removeCustomPlanMealItem = (mealType: MealType, idx: number) => {
+    setCustomPlanMeals(prev => {
+      const arr = [...prev[mealType]];
+      arr.splice(idx, 1);
+      return { ...prev, [mealType]: arr };
+    });
+  };
+  const handleCustomPlanInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setCustomPlanForm(prev => ({ ...prev, [name]: value }));
+  };
+  const handleCustomPlanSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Save as a new diet package associated with a patient
+    const newPlan = {
+      id: Date.now().toString(),
+      patientName: customPlanForm.name,
+      patientId: customPlanForm.patientId,
+      age: customPlanForm.age,
+      startDate: customPlanForm.startDate,
+      endDate: customPlanForm.endDate,
+      packageName: customPlanForm.packageName,
+      status: customPlanForm.status,
+      approvalStatus: customPlanForm.approvalStatus,
+      meals: customPlanMeals,
+      amount: customPlanAmount,
+    };
+    // Save to localStorage or your preferred storage
+    const saved = localStorage.getItem('customPlans');
+    const plans = saved ? JSON.parse(saved) : [];
+    plans.push(newPlan);
+    localStorage.setItem('customPlans', JSON.stringify(plans));
+    setShowCustomPlanForm(false);
+    setCustomPlanForm({ name: '', patientId: '', age: '', startDate: '', endDate: '', packageName: '', status: 'active', approvalStatus: 'pending' });
+    setCustomPlanMeals({ breakfast: [], brunch: [], lunch: [], evening: [], dinner: [] });
+    setCustomPlanAmount(0);
+    showNotification('Custom plan created!', 'success');
+  };
+
   return (
     <>
     <Header sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
     <div className="dietician-container">
       <div className="header" style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <PageHeader title="Dietician Interface" subtitle="Review and approve diet orders from doctors"/>
-        <button
-          className="add-custom-diet-btn"
-          onClick={() => setShowCustomDietForm(f => !f)}
-        >
-          + Add Custom Diet
-        </button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            className="add-custom-diet-btn"
+            onClick={() => setShowCustomDietForm(f => !f)}
+          >
+            + Add Patient
+          </button>
+          <button
+            className="add-custom-diet-btn"
+            style={{ background: '#fff', color: '#038ba4', border: '1px solid #038ba4' }}
+            onClick={() => setShowCustomPlanForm(true)}
+          >
+            + Add a Custom Plan
+          </button>
+        </div>
       </div>
 
       {showCustomDietForm && (
         <div className="form-section" style={{marginBottom:'2rem'}}>
-          <div className="section-header">Add Custom Diet Order</div>
+          <div className="section-header">Add Patient</div>
           <form className="form" onSubmit={handleCustomDietSubmit}>
             <div className="form-row">
               <div className="form-group">
@@ -454,6 +571,93 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
             <div className="form-actions">
               <button className="btn-text approve" type="submit">Add Order</button>
               <button className="btn-text" type="button" onClick={() => setShowCustomDietForm(false)}>Cancel</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {showCustomPlanForm && (
+        <div className="form-section" style={{ marginBottom: '2rem' }}>
+          <div className="section-header">Add Custom Plan</div>
+          <form className="form" onSubmit={handleCustomPlanSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Name</label>
+                <input type="text" name="name" className="form-control" value={customPlanForm.name} onChange={handleCustomPlanInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>Patient ID</label>
+                <input type="text" name="patientId" className="form-control" value={customPlanForm.patientId} onChange={handleCustomPlanInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>Age</label>
+                <input type="number" name="age" className="form-control" value={customPlanForm.age} onChange={handleCustomPlanInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>Start Date</label>
+                <input type="date" name="startDate" className="form-control" value={customPlanForm.startDate} onChange={handleCustomPlanInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>End Date</label>
+                <input type="date" name="endDate" className="form-control" value={customPlanForm.endDate} onChange={handleCustomPlanInputChange} />
+              </div>
+              <div className="form-group">
+                <label>Diet Package Name</label>
+                <input type="text" name="packageName" className="form-control" value={customPlanForm.packageName} onChange={handleCustomPlanInputChange} required />
+              </div>
+            </div>
+            <div className="form-section" style={{ background: '#f9f9f9', color: '#038ba4', fontWeight: 600, margin: '20px 0 10px 0' }}>Meals Configuration</div>
+            <div className="grid-two-cols">
+              {(['breakfast', 'brunch', 'lunch', 'evening', 'dinner'] as MealType[]).map(mealType => (
+                <div className="meal-card" key={mealType} style={{ minWidth: 0 }}>
+                  <h3 style={{ color: '#333', fontSize: '16px', marginBottom: '10px' }}>{mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+                    <button type="button" className="add" onClick={() => addCustomPlanMealItem(mealType)} style={{ marginLeft: '10px' }}>+ Add Item</button>
+                  </h3>
+                  {customPlanMeals[mealType].length > 0 && (
+                    <div className="meal-items">
+                      {customPlanMeals[mealType].map((item, idx) => (
+                        <div className="meal-row" key={idx}>
+                          <select value={item.foodItemId} onChange={e => updateCustomPlanMealItem(mealType, idx, 'foodItemId', e.target.value)}>
+                            <option value="">Select Food Item</option>
+                            {foodItems.map(food => (
+                              <option key={food.id} value={food.id}>{food.name}</option>
+                            ))}
+                          </select>
+                          <input type="number" value={item.quantity} min={1} onChange={e => updateCustomPlanMealItem(mealType, idx, 'quantity', parseFloat(e.target.value))} />
+                          <span>{item.unit}</span>
+                          <button type="button" className="danger" onClick={() => removeCustomPlanMealItem(mealType, idx)}>X</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Status</label>
+                <select name="status" className="form-control" value={customPlanForm.status} onChange={handleCustomPlanInputChange} required>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="stopped">Stopped</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Approval</label>
+                <select name="approvalStatus" className="form-control" value={customPlanForm.approvalStatus} onChange={handleCustomPlanInputChange} required>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Amount</label>
+                <input type="text" className="form-control" value={customPlanAmount ? `₹${customPlanAmount.toFixed(2)}` : ''} readOnly style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} />
+              </div>
+            </div>
+            <div className="form-actions">
+              <button className="btn-text approve" type="submit">Add Custom Plan</button>
+              <button className="btn-text" type="button" onClick={() => setShowCustomPlanForm(false)}>Cancel</button>
             </div>
           </form>
         </div>
@@ -602,7 +806,7 @@ const DieticianInterface: React.FC<DieticianInterface> = ({ sidebarCollapsed, to
             {selectedPackage && (
               <div className="meal-items-section">
                 <h4>Meal Items</h4>
-                {['breakfast', 'brunch', 'lunch', 'evening', 'dinner'].map((mealType) => {
+                {(['breakfast', 'brunch', 'lunch', 'evening', 'dinner'] as MealType[]).map((mealType) => {
                   const items = selectedPackage[mealType as keyof DietPackage] as MealItem[];
                   if (!items || items.length === 0) return null;
                   

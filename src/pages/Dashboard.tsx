@@ -48,6 +48,80 @@ const Dashboard: React.FC<DashboardProps> = ({ sidebarCollapsed, toggleSidebar }
     ],
   };
 
+  // Calculate percentages for pie chart
+  const totalPatients = pieData.datasets[0].data.reduce((a, b) => a + b, 0);
+  const piePercentages = pieData.datasets[0].data.map((count: number) => ((count / totalPatients) * 100));
+
+  // Pie chart options for modern theme and percentage tooltips
+  const pieOptions = {
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom' as const,
+        labels: {
+          font: { size: 13, weight: 'normal' as const },
+          color: '#333',
+          usePointStyle: true,
+          pointStyle: 'circle',
+          boxWidth: 12,
+          boxHeight: 12,
+          padding: 12,
+          generateLabels: function(chart: any) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label: string, i: number) => ({
+                text: label,
+                fillStyle: data.datasets[0].backgroundColor[i],
+                strokeStyle: data.datasets[0].borderColor?.[i] || '#fff',
+                lineWidth: 1,
+                hidden: false,
+                pointStyle: 'circle',
+                rotation: 0
+              }));
+            }
+            return [];
+          }
+        }
+      }, 
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            const label = context.label || '';
+            const value = context.raw;
+            const percent = totalPatients ? ((value / totalPatients) * 100).toFixed(1) : 0;
+            return `${label}: ${percent}%`;
+          },
+        },
+        backgroundColor: '#fff',
+        titleColor: '#333',
+        bodyColor: '#333',
+        borderColor: '#e3eafc',
+        borderWidth: 1,
+        padding: 12,
+        bodyFont: { size: 14, weight: 'bold' as const },
+        titleFont: { size: 14, weight: 'bold' as const },
+        displayColors: true,
+        boxWidth: 18,
+        boxHeight: 18,
+        cornerRadius: 8,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        shadowBlur: 8,
+        shadowColor: 'rgba(0,0,0,0.10)',
+      },
+    },
+    cutout: '50%',
+    borderRadius: 0,
+    borderWidth: 0,
+    layout: {
+      padding: 15
+    },
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+    },
+  };
+
   // Mock bar chart data (diet plan usage per month)
   const barData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
@@ -92,7 +166,7 @@ const Dashboard: React.FC<DashboardProps> = ({ sidebarCollapsed, toggleSidebar }
         <div className="dashboard-charts-row">
           <div className="dashboard-chart dashboard-pie">
             <h3>Diet Categories</h3>
-            <Pie data={pieData} />
+            <Pie data={pieData} options={pieOptions} />
           </div>
           <div className="dashboard-chart dashboard-bar">
             <h3>Diet Plan Usage (per month)</h3>

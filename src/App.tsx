@@ -11,6 +11,8 @@ import DietOrderForm from './pages/DietOrderForm';
 import DietPackageForm from './pages/DietPackageForm';
 import FoodItemForm from './pages/FoodItemForm';
 import Dashboard from './pages/Dashboard';
+import DietRequestManagement from './pages/DietRequestManagement';
+import DietRequestApproval from './pages/DietRequestApproval';
 // import VehicleRegistration from './pages/VehicleRegistration.tsx';
 // import VehicleList from './pages/VehicleList.tsx';
 // import InsuranceManagement from './pages/InsuranceManagement.tsx';
@@ -51,6 +53,9 @@ const App: React.FC = () => {
               <Route path="/dietorder" element={<DietOrderForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietician" element={<DieticianInterface sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/canteen" element={<CanteenInterface sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
+              <Route path="/dietrequest" element={<DietRequestManagement sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
+              <Route path="/dietrequestapproval" element={<DietRequestApproval />} />
+              {/* <Route path="/dietrequestapproval" element={<DietRequestApproval sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} /> */}
 
               {/* <Route path="/fooditem" element={<FoodItemForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} /> */}
               {/* <Route path="/dashboard" element={<Dashboard sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
