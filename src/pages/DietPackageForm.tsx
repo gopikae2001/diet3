@@ -65,6 +65,7 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
   }, []);
   
   // Load saved packages from localStorage on initial render
+  const [searchTerm, setSearchTerm] = useState('');
   const [dietPackages, setDietPackages] = useState<DietPackage[]>(() => {
     try {
       const saved = localStorage.getItem('dietPackages');
@@ -73,6 +74,19 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
       console.error('Failed to load diet packages from localStorage:', error);
       return [];
     }
+  });
+
+  const filteredDietPackages = dietPackages.filter((pkg, index) => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (index + 1).toString().includes(searchLower) ||
+      pkg.name.toLowerCase().includes(searchLower) ||
+      pkg.type.toLowerCase().includes(searchLower) ||
+      pkg.totalRate.toString().includes(searchLower) ||
+      pkg.totalNutrition.calories.toString().includes(searchLower)
+    );
   });
 
   // Save packages to localStorage whenever they change
@@ -388,26 +402,109 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
         </form>
       </div>
 
-      {dietPackages.length > 0 && (
-        <div className="table-container">
-          <div className="form-section">Diet Packages List</div>
-          <table>
-            <thead>
+      <div className="table-container">
+        <div className="form-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="section-header" style={{ marginBottom: 0 }}>Diet Packages List</div>
+          <div className="search-container" style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '280px' }}>
+              <i className="fa fa-search" style={{
+                position: 'absolute',
+                left: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#999',
+                fontSize: '14px'
+              }}></i>
+              <input
+                type="text"
+                placeholder="Search by name, type, rate..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: '8px 8px 8px 34px',
+                  width: '100%',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  transition: 'border-color 0.3s',
+                  backgroundColor: '#fff',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0d92ae'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              />
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Package Name</th>
+              <th>Diet Type</th>
+              <th>Breakfast</th>
+              <th>Brunch</th>
+              <th>Lunch</th>
+              <th>Evening</th>
+              <th>Dinner</th>
+              <th>Total Rate</th>
+              <th>Total Calories</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredDietPackages.length === 0 ? (
               <tr>
-                <th>S.No.</th>
-                <th>Package Name</th>
-                <th>Diet Type</th>
-                <th>Total Rate</th>
-                <th>Total Calories</th>
-                <th>Actions</th>
+                <td colSpan={11} style={{ textAlign: 'center', padding: '20px' }}>
+                  {dietPackages.length === 0 
+                    ? 'No diet packages available' 
+                    : searchTerm 
+                      ? 'No matching packages found' 
+                      : 'No diet packages available'}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {dietPackages.map((pkg, index) => (
+            ) : (
+              filteredDietPackages.map((pkg, index) => (
                 <tr key={pkg.id}>
                   <td>{index + 1}</td>
                   <td>{pkg.name}</td>
                   <td>{pkg.type}</td>
+                  <td>
+                    {pkg.breakfast?.map((item: MealItem, i: number) => (
+                      <div key={i} className="meal-item">
+                        {item.quantity} {item.unit} {item.foodItemName}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    {pkg.brunch?.map((item: MealItem, i: number) => (
+                      <div key={i} className="meal-item">
+                        {item.quantity} {item.unit} {item.foodItemName}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    {pkg.lunch?.map((item: MealItem, i: number) => (
+                      <div key={i} className="meal-item">
+                        {item.quantity} {item.unit} {item.foodItemName}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    {pkg.evening?.map((item: MealItem, i: number) => (
+                      <div key={i} className="meal-item">
+                        {item.quantity} {item.unit} {item.foodItemName}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    {pkg.dinner?.map((item: MealItem, i: number) => (
+                      <div key={i} className="meal-item">
+                        {item.quantity} {item.unit} {item.foodItemName}
+                      </div>
+                    ))}
+                  </td>
                   <td>₹{pkg.totalRate.toFixed(2)}</td>
                   <td>{pkg.totalNutrition.calories.toFixed(1)}</td>
                   <td>
@@ -427,15 +524,15 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
     <Footer/>
     </>
   );
-}
+};
 
 export default DietPackageForm;

@@ -24,7 +24,29 @@ const DietRequestApproval: React.FC = () => {
   const [requests, setRequests] = useState<DietRequest[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
   const [editRequest, setEditRequest] = useState<Partial<DietRequest> | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  // Filter requests based on search term across all fields
+  const filteredRequests = requests.filter((request, index) => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const serialNumber = (index + 1).toString();
+    
+    return (
+      serialNumber.includes(searchLower) ||
+      request.patientId.toLowerCase().includes(searchLower) ||
+      request.patientName.toLowerCase().includes(searchLower) ||
+      request.age.toString().toLowerCase().includes(searchLower) ||
+      request.bed.toLowerCase().includes(searchLower) ||
+      request.ward.toLowerCase().includes(searchLower) ||
+      request.floor.toLowerCase().includes(searchLower) ||
+      request.doctor.toLowerCase().includes(searchLower) ||
+      request.doctorNotes.toLowerCase().includes(searchLower) ||
+      request.status.toLowerCase().includes(searchLower)
+    );
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem('dietRequests');
@@ -111,7 +133,39 @@ const DietRequestApproval: React.FC = () => {
           <PageHeader title="Diet Request Approval" subtitle="Review and approve patient diet requests" />
         </div>
         <div className="form-section">
-          <div className="section-header">Requested Patients</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div className="section-header" style={{ marginBottom: 0 }}>Requested Patients</div>
+            <div className="search-container" style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '280px' }}>
+              <i className="fa fa-search" style={{
+                position: 'absolute',
+                left: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#999',
+                fontSize: '14px'
+              }}></i>
+              <input
+                type="text"
+                placeholder="Search here..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: '0.5rem 0.5rem 0.5rem 32px',
+                  width: '100%',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  transition: 'border-color 0.3s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#038ba4'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              />
+            </div>
+            </div>
+          </div>
           <div className="dietrequest-table-container">
             <table className="dietrequest-table">
               <thead>
@@ -133,7 +187,7 @@ const DietRequestApproval: React.FC = () => {
                 {requests.length === 0 ? (
                   <tr><td colSpan={11} style={{ textAlign: 'center' }}>No diet requests found.</td></tr>
                 ) : (
-                  requests.map((req, index) => (
+                  filteredRequests.map((req, index) => (
                     <tr key={req.id}>
                       <td>{index + 1}</td>
                       {editId === req.id ? (

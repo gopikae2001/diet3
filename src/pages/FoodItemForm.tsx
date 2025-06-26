@@ -32,14 +32,18 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
     initializeMockData();
   }, []);
 
-  // Load food items using the API
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  // State for food items and search
+  const [allFoodItems, setAllFoodItems] = useState<FoodItem[]>([]);
+  const [filteredFoodItems, setFilteredFoodItems] = useState<FoodItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   
+  // Load food items using the API
   useEffect(() => {
     const loadFoodItems = async () => {
       try {
         const items = await foodItemApi.getAll();
-        setFoodItems(items);
+        setAllFoodItems(items);
+        setFilteredFoodItems(items);
       } catch (error) {
         console.error('Failed to load food items:', error);
       }
@@ -47,6 +51,33 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
     
     loadFoodItems();
   }, []);
+  
+  // Filter food items based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredFoodItems(allFoodItems);
+      return;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = allFoodItems.filter((item, index) => {
+      return (
+        (index + 1).toString().includes(searchLower) || // S.No
+        item.name.toLowerCase().includes(searchLower) || // Name
+        item.foodType.toLowerCase().includes(searchLower) || // Food Type
+        item.category.toLowerCase().includes(searchLower) || // Category
+        item.unit.toLowerCase().includes(searchLower) || // Unit
+        item.quantity.toString().includes(searchLower) || // Quantity
+        item.price.toString().includes(searchLower) || // Price
+        item.calories.toString().includes(searchLower) || // Calories
+        item.protein.toString().includes(searchLower) || // Protein
+        item.carbohydrates.toString().includes(searchLower) || // Carbs
+        item.fat.toString().includes(searchLower) // Fat
+      );
+    });
+    
+    setFilteredFoodItems(filtered);
+  }, [searchTerm, allFoodItems]);
   const [showCustomUnit, setShowCustomUnit] = useState<boolean>(false);
   const [customUnit, setCustomUnit] = useState<string>('');
   const [formData, setFormData] = useState<FoodItemFormData>({
@@ -144,13 +175,17 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
 
     try {
       if (editingId) {
-        await foodItemApi.update(editingId, newItem);
-        setFoodItems(items => items.map(item => item.id === editingId ? newItem : item));
+        const updatedItem = await foodItemApi.update(editingId, newItem);
+        const updatedItems = allFoodItems.map(item => item.id === editingId ? updatedItem : item);
+        setAllFoodItems(updatedItems);
+        setFilteredFoodItems(updatedItems);
         setEditingId(null);
         setNotification({ message: 'Item updated successfully!', show: true });
       } else {
         const createdItem = await foodItemApi.create(newItem);
-        setFoodItems(items => [...items, createdItem]);
+        const updatedItems = [...allFoodItems, createdItem];
+        setAllFoodItems(updatedItems);
+        setFilteredFoodItems(updatedItems);
         setNotification({ message: 'Item added successfully!', show: true });
       }
       // Hide notification after 3 seconds
@@ -202,7 +237,9 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         await foodItemApi.delete(id);
-        setFoodItems(items => items.filter(item => item.id !== id));
+        const updatedItems = allFoodItems.filter(item => item.id !== id);
+        setAllFoodItems(updatedItems);
+        setFilteredFoodItems(updatedItems);
         setNotification({ message: 'Item deleted successfully!', show: true });
         setTimeout(() => setNotification({ message: '', show: false }), 3000);
         
@@ -419,9 +456,41 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
           </button>
         </form>
 
-        {foodItems.length > 0 && (
+        {allFoodItems.length > 0 && (
           <div className="table-section">
-            <h4>Food Items List</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h4 style={{ margin: 0 }}>Food Items List</h4>
+              <div className="search-container" style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ position: 'relative', width: '280px' }}>
+                <i className="fa fa-search" style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#999',
+                  fontSize: '14px'
+                }}></i>
+                <input
+                  type="text"
+                  placeholder="Search by name, type, category, etc..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    padding: '0.5rem 0.5rem 0.5rem 32px',
+                    width: '100%',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.3s',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#038ba4'}
+                  onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                />
+              </div>
+            </div>
+          </div>
             <table>
               <thead>
                 <tr>
@@ -440,7 +509,14 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
                 </tr>
               </thead>
               <tbody>
-                {foodItems.map((item, index) => (
+                {filteredFoodItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={12} style={{ textAlign: 'center', padding: '20px' }}>
+                      {searchTerm ? 'No matching food items found' : 'No food items available'}
+                    </td>
+                  </tr>
+                ) : (
+                  filteredFoodItems.map((item, index) => (
                   <tr key={item.id}>
                     <td>{index + 1}</td>
                     <td>{item.name}</td>
@@ -468,7 +544,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
                       </button>
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>
