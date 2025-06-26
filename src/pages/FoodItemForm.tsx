@@ -491,7 +491,7 @@ const FoodItemForm: React.FC<FoodItemFormProps> = ({ sidebarCollapsed, toggleSid
               </div>
             </div>
           </div>
-            <table>
+            <table className="fooditem-table">
               <thead>
                 <tr>
                   <th>S.No.</th>

@@ -251,7 +251,7 @@ const CanteenInterface: React.FC<CanteenInterfaceProps> = ({ sidebarCollapsed, t
         {Object.entries(totalQuantities).map(([item, quantity]) => (
           <div key={item} className="summary-box">
             <div className="item-name">{item}</div>
-            <div className="item-quantity">{quantity} portions</div>
+            <div className="item-quantity">{quantity} portion</div>
           </div>
         ))}
       </div>

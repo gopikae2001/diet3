@@ -12,6 +12,7 @@
   gap: 20px;
 }
 
+
 .dietpackage-container .form-section {
   /* background-color: #0d92ae; */
   color: white;
@@ -23,6 +24,14 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.section-header2 {
+  background-color: #038ba4;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
 .form-container {
   border: 1px solid #ddd;
   border-top: none;
@@ -256,7 +265,16 @@ button.outline {
 
 .table-container th,
 .table-container td {
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 1rem;
+  /* border: 1px solid #ddd; */
   text-align: left;
+}
+
+.dietpackage-table tbody tr:hover{
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.dietpackage-table th, .dietpackage-table td {
+  font-size: 0.95rem;
 }

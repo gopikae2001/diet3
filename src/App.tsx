@@ -54,7 +54,7 @@ const App: React.FC = () => {
               <Route path="/dietician" element={<DieticianInterface sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/canteen" element={<CanteenInterface sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/dietrequest" element={<DietRequestManagement sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
-              <Route path="/dietrequestapproval" element={<DietRequestApproval />} />
+              <Route path="/dietrequestapproval" element={<DietRequestApproval sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               {/* <Route path="/dietrequestapproval" element={<DietRequestApproval sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} /> */}
 
               {/* <Route path="/fooditem" element={<FoodItemForm sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} /> */}

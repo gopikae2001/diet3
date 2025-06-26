@@ -306,7 +306,7 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
         <div className="header">
         <PageHeader title="Diet Order" subtitle="Meal preparation and delivery management" />
       </div>
-      <div className="form-section">
+      <div className="form-section3">
         {/* <div className="section-header">Diet Order</div> */}
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -503,9 +503,9 @@ const DietOrderForm: React.FC<DietOrderFormProps> = ({ sidebarCollapsed, toggleS
       </div>
 
       {orders.length > 0 && (
-        <div className="form-section">
+        <div className="form-section3">
           <div className="section-header">Diet Orders</div>
-          <table>
+          <table className="order-table">
             <thead>
               <tr>
                 <th>S.No</th>

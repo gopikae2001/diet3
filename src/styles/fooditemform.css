@@ -177,19 +177,19 @@ table {
   border-collapse: collapse;
   min-width: 600px;
 }
-
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
+  /* border: 1px solid #ddd; */
+  padding: 0.6rem;
   text-align: left;
   vertical-align: middle;
 }
 
 th {
-  background-color: #038ba4;
-  color: white;
+  background-color: #f8f9fa;
+  color: #038ba4;
   font-weight: 600;
+  padding: 0.6rem;
 }
 
 button.action-btn {
@@ -205,4 +205,13 @@ button.action-btn {
 
 button.action-btn:hover {
   background-color: #bbb;
+  /* transform: scale(1.1); */
+}
+.fooditem-table tbody tr:hover{
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.fooditem-table th, .fooditem-table td {
+  font-size: 0.95rem;
 }

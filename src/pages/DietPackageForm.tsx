@@ -403,8 +403,8 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
       </div>
 
       <div className="table-container">
-        <div className="form-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div className="section-header" style={{ marginBottom: 0 }}>Diet Packages List</div>
+        <div className="form-section2" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="section-header2" style={{ marginBottom: 0 }}>Diet Packages List</div>
           <div className="search-container" style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{ position: 'relative', width: '280px' }}>
               <i className="fa fa-search" style={{
@@ -437,7 +437,7 @@ const DietPackageForm: React.FC<DietPackageFormProps> = ({ sidebarCollapsed, tog
             </div>
           </div>
         </div>
-        <table>
+        <table className="dietpackage-table">
           <thead>
             <tr>
               <th>S.No.</th>

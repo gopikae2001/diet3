@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/DietPackageForm.css';
-import '../styles/DietRequestManagement.css';
-import '../styles/DietOrder.css';
+import '../styles/dietrequestapproval.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import PageHeader from '../components/PageHeader';
@@ -20,7 +18,12 @@ interface DietRequest {
   status: 'Pending' | 'Diet Order Placed' | 'Rejected';
 }
 
-const DietRequestApproval: React.FC = () => {
+interface DietRequestApprovalProps {
+  sidebarCollapsed: boolean;
+  toggleSidebar: () => void;
+}
+
+const DietRequestApproval: React.FC<DietRequestApprovalProps> = ({ sidebarCollapsed, toggleSidebar }) => {
   const [requests, setRequests] = useState<DietRequest[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
   const [editRequest, setEditRequest] = useState<Partial<DietRequest> | null>(null);
@@ -127,12 +130,12 @@ const DietRequestApproval: React.FC = () => {
 
   return (
     <>
-      <Header sidebarCollapsed={false} toggleSidebar={() => {}} />
+      <Header sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
       <div className="dietrequest-container">
         <div className="header">
           <PageHeader title="Diet Request Approval" subtitle="Review and approve patient diet requests" />
         </div>
-        <div className="form-section">
+        <div className="form-section3">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div className="section-header" style={{ marginBottom: 0 }}>Requested Patients</div>
             <div className="search-container" style={{ display: 'flex', alignItems: 'center' }}>
@@ -169,7 +172,7 @@ const DietRequestApproval: React.FC = () => {
           <div className="dietrequest-table-container">
             <table className="dietrequest-table">
               <thead>
-                <tr style={{ backgroundColor: '#038ba4', color: 'white' }}>
+                <tr>
                   <th>S.No</th>
                   <th>Patient ID</th>
                   <th>Patient Name</th>

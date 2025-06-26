@@ -194,7 +194,7 @@ const DietRequestManagement: React.FC<DietRequestManagementProps> = ({ sidebarCo
         <div className="header">
           <PageHeader title="Diet Request Management" subtitle="Manage and approve diet requests from hospital staff" />
         </div>
-        <div className="form-section">
+        <div className="form-section3">
           <div className="section-header">Add Diet Request</div>
           <form className="form" onSubmit={handleAddRequest} style={{ marginBottom: 0 }}>
             <div className="form-row" style={{ flexWrap: 'wrap', gap: '1.5rem' }}>
